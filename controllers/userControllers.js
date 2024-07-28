@@ -1,6 +1,6 @@
 import User from '../models/User.js';
 
-export const registerUser = async (req, res, next) => {
+const registerUser = async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
 
@@ -30,7 +30,7 @@ export const registerUser = async (req, res, next) => {
     }
 };
 
-export const loginUser = async (req, res, next) => {
+const loginUser = async (req, res, next) => {
     try{
         const {email, password} = req.body;
 
@@ -60,7 +60,7 @@ export const loginUser = async (req, res, next) => {
     }
 };
 
-export const userProfile = async(req, res, next) => {
+const userProfile = async(req, res, next) => {
     try{
         let user = await User.findById(req.user._id);
         if(user){
@@ -82,3 +82,37 @@ export const userProfile = async(req, res, next) => {
         next(error);
     }
 }
+
+const updateProfile = async(req, res, next) =>{
+    try{
+        let user = await User.findById(req.user._id);
+
+        if(!user){
+            throw new Error("User not found")
+        }
+
+        user.name = req.body.name || user.name;
+        user.email = req.body.email || user.email;
+        if(req.body.password && req.body.password.length < 6){
+            throw new Error("Password length must be at least 6 characters");
+        }else if(req.body.password){
+            user.password = req.body.password;
+        }
+
+        const updatedUserProfile = await user.save()
+
+        res.json({
+            _id: updatedUserProfile._id,
+            avatar: updatedUserProfile.avatar,
+            name: updatedUserProfile.name,
+            email: updatedUserProfile.email,
+            verified: updatedUserProfile.verified,
+            admin: updatedUserProfile.admin,
+            token: await updatedUserProfile.generateJWT(),
+        })
+    }catch(error){
+        next(error);
+    }
+}
+
+export {registerUser, loginUser, userProfile, updateProfile}
