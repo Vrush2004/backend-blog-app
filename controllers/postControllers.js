@@ -1,5 +1,5 @@
 import Post from '../models/Post.js';
-import Comment from '../models/commentModel.js'; // Ensure you have the Comment model correctly imported
+import Comment from '../models/Comment.js'; 
 import { uploadPicture } from "../middleware/uploadPictureMiddleware.js";
 import { fileRemover } from "../utils/fileRemover.js";
 import {v4 as uuidv4} from 'uuid'
@@ -81,7 +81,7 @@ export const updatePost= async (req, res, next) => {
 
 export const deletePost = async (req, res, next) => {
     try {
-        const post = await Post.findOneAndDelete({ slug: req.params.slug });
+        const post = await Post.findOneAndDelete({ slug: req.params.slug })
         
         if (!post) {
             const error = new Error("Post not found");
@@ -98,3 +98,42 @@ export const deletePost = async (req, res, next) => {
         next(error);
     }
 };
+
+export const getPost = async (req, res, next) => {
+    try{
+        const post = await Post.findOne({slug: req.params.slug}).populate([
+            {
+                path: 'user',
+                select: ["avatar", "name"],
+            },
+            {
+                path: "comments",
+                match:{
+                    check: true,
+                    parent: null
+                },
+                populate: [
+                    {
+                        path: "user",
+                        select: ["avatar", "name"]
+                    },
+                    {
+                        path: "replies",
+                        match: {
+                            check: true,
+                        }
+                    }
+                ],
+            },
+        ]);
+
+        if(!post){
+            const error = new Error("Post was not found")
+            return next(error)
+        }
+
+        return res.json(post)
+    }catch (error){
+        next(error)
+    }
+}

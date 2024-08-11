@@ -12,6 +12,7 @@ import { errorResponserHandler, invalidPathHandler } from './middleware/errorHan
 //Routes
 import userRoutes from './routes/userRoutes.js'
 import postRoutes from './routes/postRoutes.js'
+import commentRoutes from './routes/commentRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -25,6 +26,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/comments', commentRoutes);
 
 //Static assets
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
