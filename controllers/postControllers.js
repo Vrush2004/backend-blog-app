@@ -3,6 +3,7 @@ import Comment from '../models/Comment.js';
 import { uploadPicture } from "../middleware/uploadPictureMiddleware.js";
 import { fileRemover } from "../utils/fileRemover.js";
 import {v4 as uuidv4} from 'uuid'
+import { populate } from 'dotenv';
 
 export const createPost= async (req, res, next) => {
   try {
@@ -121,8 +122,14 @@ export const getPost = async (req, res, next) => {
                         path: "replies",
                         match: {
                             check: true,
-                        }
-                    }
+                        },
+                        populate:[
+                            {
+                                path: "user",
+                                select: ["avatar", "name"]
+                            },
+                        ],
+                    },
                 ],
             },
         ]);
