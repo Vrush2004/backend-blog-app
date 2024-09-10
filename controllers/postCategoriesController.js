@@ -1,4 +1,4 @@
-import PostCategories from "../models/PostCategories"
+import PostCategories from "../models/PostCategories.js"
 
 const createPostCategory = async(req, res, next) =>{
     try {
@@ -21,5 +21,36 @@ const createPostCategory = async(req, res, next) =>{
         next(error)
     }
 }
+const getAllPostCategories = async(req, res, next) =>{
+    try {
+        const postCategories = await PostCategories.find({})
 
-export { createPostCategory }
+       return res.json(postCategories)
+    } catch (error) {
+        next(error)
+    }
+}
+const updatePostCategory = async(req, res, next) =>{
+    try {
+        const {title} = req.body
+
+        const postcategory = await PostCategories.findByIdAndUpdate(req.params.postCategoryId,
+        {
+            title
+        },
+        {
+            new: true
+        })
+
+        if (!postcategory){
+            const error = new Error("Category was not found")
+            return next(error)
+        }
+
+        return res.json(postcategory)
+    } catch (error) {
+        next(error)
+    }
+}
+
+export { createPostCategory, getAllPostCategories, updatePostCategory }
