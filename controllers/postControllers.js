@@ -4,6 +4,7 @@ import { uploadPicture } from "../middleware/uploadPictureMiddleware.js";
 import { fileRemover } from "../utils/fileRemover.js";
 import {v4 as uuidv4} from 'uuid'
 import { populate } from 'dotenv';
+import { json } from 'express';
 
 export const createPost= async (req, res, next) => {
   try {
@@ -29,7 +30,7 @@ export const createPost= async (req, res, next) => {
 export const updatePost= async (req, res, next) => {
     try {
       
-        const post = await Post.findOne({slug: req.params.slu})
+        const post = await Post.findOne({slug: req.params.slug})
 
         if(!post) {
             const error = new Error("Post was not found");
@@ -159,9 +160,16 @@ export const getAllPosts = async (req, res,next) => {
         const total = await Post.find(where).countDocuments()
         const pages = Math.ceil(total/pageSize)
 
+        res.header({
+            'x-filter': filter,
+            'x-totalcount': JSON.stringify(total),
+            'x-currentpage' : JSON.stringify(page),
+            'x-pagesize' : JSON.stringify(pageSize),
+            'x-totalpagecount':JSON.stringify(pages),
+        });
+
         if (page > pages){
-            const error = new Error("No page found")
-            return next(error)
+            return res,json([])
         }
 
         const result = await query.skip(skip).limit(pageSize).populate([
@@ -171,13 +179,6 @@ export const getAllPosts = async (req, res,next) => {
             }
         ]).sort({updatedAt: "desc"});
 
-        res.header({
-            'x-filter': filter,
-            'x-totalcount': JSON.stringify(total),
-            'x-currentpage' : JSON.stringify(page),
-            'x-pagesize' : JSON.stringify(pageSize),
-            'x-totalpagecount':JSON.stringify(pages),
-        });
 
         return res.json(result)
     } catch (error) {

@@ -1,9 +1,10 @@
 import { Schema, model } from "mongoose";
 
-const PostCategoriesSchema = new Schema({
-    name: { type: String, required: true },
-}, 
-{ timestamps: true }
+const PostCategoriesSchema = new Schema(
+    {
+    title: { type: String, required: true },
+    }, 
+    { timestamps: true }
 );
 
 const PostCategories = model("PostCategories", PostCategoriesSchema);
