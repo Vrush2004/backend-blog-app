@@ -109,6 +109,10 @@ export const getPost = async (req, res, next) => {
                 select: ["avatar", "name"],
             },
             {
+                path: 'categories',
+                select: ["title"],
+            },
+            {
                 path: "comments",
                 match:{
                     check: true,
@@ -176,6 +180,10 @@ export const getAllPosts = async (req, res,next) => {
             {
                 path:"user",
                 select: ["avatar", "name", "verified"]
+            },
+            {
+                path: "categories",
+                select: ["title"]
             }
         ]).sort({updatedAt: "desc"});
 

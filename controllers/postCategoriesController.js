@@ -1,3 +1,4 @@
+import Post from "../models/Post.js";
 import PostCategories from "../models/PostCategories.js"
 
 const createPostCategory = async(req, res, next) =>{
@@ -52,5 +53,23 @@ const updatePostCategory = async(req, res, next) =>{
         next(error)
     }
 }
+const deletePostCategory = async(req, res, next) =>{
+    try {
+        const categoryId = req.params.postCategoryId;
 
-export { createPostCategory, getAllPostCategories, updatePostCategory }
+        await Post.updateMany(
+            {categories: {$in: [categoryId]}},
+            {$pull: {categories: categoryId}}
+        );
+
+        await PostCategories.deleteOne({_id: categoryId})
+
+        res.send({
+            message: "Post Catrgory is successfully deleted!"
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+export { createPostCategory, getAllPostCategories, updatePostCategory, deletePostCategory }
