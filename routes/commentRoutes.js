@@ -1,9 +1,9 @@
 import express from "express";
 const router = express.Router();
-import {createComment, deleteComment, UpdateComment } from "../controllers/commentControllers.js";
-import {authGuard} from "../middleware/authMiddleware.js"
+import {createComment, deleteComment, getAllComments, UpdateComment } from "../controllers/commentControllers.js";
+import {adminGuard, authGuard} from "../middleware/authMiddleware.js"
 
-router.post('/', authGuard, createComment);
+router.post('/', authGuard, createComment).get(authGuard, adminGuard, getAllComments);
 router.route('/:commentId').put(authGuard, UpdateComment).delete(authGuard, deleteComment)
 
 export default router;
