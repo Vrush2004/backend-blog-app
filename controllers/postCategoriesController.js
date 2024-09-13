@@ -15,9 +15,9 @@ const createPostCategory = async(req, res, next) =>{
             title
         })
 
-        const savedPostCategoty = await newPostCategory.save()
+        const savedPostCategory = await newPostCategory.save()
 
-        return res.status(201).json(savedPostCategoty)
+        return res.status(201).json(savedPostCategory)
     } catch (error) {
         next(error)
     }
@@ -98,4 +98,18 @@ const deletePostCategory = async(req, res, next) =>{
     }
 }
 
-export { createPostCategory, getAllPostCategories, updatePostCategory, deletePostCategory }
+const getSingleCategory = async(req, res, next) =>{
+    try {
+        const postCategory = await PostCategories.findById(req.params.postCategoryId)
+        if(!postCategory){
+            const error = new Error("Category was not found!")
+            return next(error)
+        }
+
+        return res.status(201).json(postCategory)
+    } catch (error) {
+        next(error)
+    }
+}
+
+export { createPostCategory, getAllPostCategories, updatePostCategory, deletePostCategory, getSingleCategory }
