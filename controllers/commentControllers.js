@@ -29,7 +29,7 @@ export const createComment = async (req, res, next) => {
 
 export const UpdateComment = async (req, res, next) => {
     try{
-        const {desc} = req.body;
+        const {desc, check} = req.body;
 
         const comment = await Comment.findById(req.params.commentId);
 
@@ -39,6 +39,7 @@ export const UpdateComment = async (req, res, next) => {
         }
 
         comment.desc = desc || comment.desc
+        comment.check = typeof check !== "undefined" ? check : comment.check
 
         const updatedComment = await comment.save()
         return res.json(updatedComment)
@@ -69,7 +70,7 @@ export const getAllComments = async (req, res,next) => {
         const filter = req.query.searchKeyword;
         let where = {};
         if(filter){
-            where.title = {$regex: filter, $options: "i"};
+            where.desc = {$regex: filter, $options: "i"};
         }
         let query = Comment.find(where);
         const page = parseInt(req.query.page) || 1;
