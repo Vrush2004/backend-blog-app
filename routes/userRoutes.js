@@ -16,7 +16,7 @@ const router = express.Router();
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.get('/profile',authGuard, userProfile);
-router.put('/updateProfile',authGuard, updateProfile);
+router.put('/updateProfile/:userId',authGuard, updateProfile);
 router.put('/updateProfilePicture', authGuard,  uploadPicture.single('profilePicture'), updateProfilePicture);
 router.get("/", authGuard, adminGuard, getAllUsers)
 router.delete("/:userId", authGuard, adminGuard, deleteUser)

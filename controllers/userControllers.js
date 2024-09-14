@@ -89,9 +89,23 @@ export const userProfile = async (req, res, next) => {
 
 export const updateProfile = async (req, res, next) => {
   try {
-    let user = await User.findById(req.user._id);
+    const userIdUpdate = req.params.userId;
+
+    let userId = req.user._id;
+
+    if(!req.user.admin && userId !== userIdToUpdate){
+      let error = new Error("Forbidden resource")
+      error.statusCode = 403;
+      throw error;
+    }
+
+    let user = await User.findById(userIdToUpdate);
     if (!user) {
       throw new Error("User not found");
+    }
+
+    if (typeof req.body.admin !== "undefined" && req.user.admin){
+      user.admin = req.body.admin
     }
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
@@ -208,7 +222,7 @@ export const getAllUsers = async (req, res, next) => {
 
 export const deleteUser = async (req, res, next) => {
   try {
-    let user = await User.findById(req, params.userId)
+    let user = await User.findById(req.params.userId)
 
     if(!user){
       throw new Error("User Not Found")
@@ -225,7 +239,12 @@ export const deleteUser = async (req, res, next) => {
       _id: {$in: postIdsToDelete}
     })
 
-    await user.remove();
+    postsToDelete.forEach((post) => {
+      fileRemover(post.photo)
+    })
+
+    await User.findByIdAndDelete(req.params.userId);
+    fileRemover(user.avatar)
 
     res.status(204).json({message: "User is deleted successfully"})
   } catch (error) {
